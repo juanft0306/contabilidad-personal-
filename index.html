@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mi Dashboard Financiero</title>
-    <!-- Tailwind CSS (Diseño) cargado directamente sin instalación -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Lucide Icons (Íconos) -->
+    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col pb-24 font-sans p-4 md:p-8">
@@ -15,7 +15,7 @@
         <!-- Cabecera -->
         <div class="mb-8">
             <h1 class="text-3xl font-bold text-white mb-2">Mi Dashboard Financiero</h1>
-            <p class="text-slate-400">Control de gastos e intercambios en múltiples divisas</p>
+            <p class="text-slate-400">Control de flujo de caja e inversiones</p>
         </div>
 
         <!-- Tarjetas de Balances -->
@@ -23,14 +23,14 @@
             <!-- Los balances se generan por JavaScript -->
         </div>
 
-        <div class="grid md:grid-cols-3 gap-6">
+        <div class="grid md:grid-cols-3 gap-6 mt-4">
             <!-- Panel Izquierdo: Formularios -->
             <div class="md:col-span-1 bg-slate-800 rounded-xl border border-slate-700 p-5 shadow-lg h-fit">
                 
                 <!-- Pestañas -->
                 <div class="flex space-x-2 mb-6 bg-slate-900 p-1 rounded-lg">
                     <button id="tab-normal" onclick="switchTab('normal')" class="flex-1 py-2 text-sm font-medium rounded-md transition-colors bg-slate-700 text-white">
-                        Ingreso / Gasto
+                        Movimientos
                     </button>
                     <button id="tab-intercambio" onclick="switchTab('intercambio')" class="flex-1 py-2 text-sm font-medium rounded-md transition-colors text-slate-400 hover:text-white">
                         Intercambio
@@ -39,12 +39,20 @@
 
                 <!-- Formulario Normal -->
                 <form id="form-normal" onsubmit="handleAddNormal(event)" class="space-y-4">
+                    
+                    <!-- Botones de Tipo de Transacción (2x2) -->
                     <div class="grid grid-cols-2 gap-2">
-                        <button type="button" id="btn-ingreso" onclick="setType('ingreso')" class="p-2 rounded-lg border flex items-center justify-center gap-2 bg-emerald-500/20 border-emerald-500 text-emerald-400">
+                        <button type="button" id="btn-ingreso" onclick="setType('ingreso')" class="p-2 rounded-lg border flex items-center justify-center gap-2 bg-emerald-500/20 border-emerald-500 text-emerald-400 text-sm font-medium transition-colors">
                             <i data-lucide="arrow-down-circle" class="w-4 h-4"></i> Ingreso
                         </button>
-                        <button type="button" id="btn-gasto" onclick="setType('gasto')" class="p-2 rounded-lg border flex items-center justify-center gap-2 border-slate-600 text-slate-400">
+                        <button type="button" id="btn-gasto" onclick="setType('gasto')" class="p-2 rounded-lg border flex items-center justify-center gap-2 border-slate-600 text-slate-400 text-sm font-medium transition-colors">
                             <i data-lucide="arrow-up-circle" class="w-4 h-4"></i> Gasto
+                        </button>
+                        <button type="button" id="btn-inversion" onclick="setType('inversion')" class="p-2 rounded-lg border flex items-center justify-center gap-2 border-slate-600 text-slate-400 text-sm font-medium transition-colors">
+                            <i data-lucide="trending-up" class="w-4 h-4"></i> Invertir
+                        </button>
+                        <button type="button" id="btn-retorno" onclick="setType('retorno')" class="p-2 rounded-lg border flex items-center justify-center gap-2 border-slate-600 text-slate-400 text-sm font-medium transition-colors" title="Retornar capital invertido a tu saldo disponible">
+                            <i data-lucide="corner-down-left" class="w-4 h-4"></i> Retirar Inv.
                         </button>
                     </div>
 
@@ -71,10 +79,10 @@
 
                     <div>
                         <label class="block text-sm text-slate-400 mb-1">Descripción</label>
-                        <input type="text" id="normal-desc" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white outline-none focus:border-indigo-500" placeholder="Ej. Compra de insumos">
+                        <input type="text" id="normal-desc" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white outline-none focus:border-indigo-500" placeholder="Ej. Compra, Binance, etc.">
                     </div>
 
-                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 rounded-lg transition-colors">
+                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 rounded-lg transition-colors shadow-lg">
                         Registrar Movimiento
                     </button>
                 </form>
@@ -82,7 +90,7 @@
                 <!-- Formulario Intercambio -->
                 <form id="form-intercambio" onsubmit="handleAddExchange(event)" class="space-y-4 hidden">
                     <div class="p-3 bg-rose-500/10 border border-rose-500/30 rounded-lg space-y-3">
-                        <h4 class="text-xs font-semibold text-rose-400 uppercase tracking-wider">Sale de:</h4>
+                        <h4 class="text-xs font-semibold text-rose-400 uppercase tracking-wider">Sale de Disponible:</h4>
                         <div class="grid grid-cols-2 gap-2">
                             <input type="number" id="exchange-amount-from" step="0.01" required class="bg-slate-900 border border-slate-700 rounded-lg p-2 text-white outline-none focus:border-rose-500" placeholder="Monto">
                             <select id="exchange-currency-from" class="bg-slate-900 border border-slate-700 rounded-lg p-2 text-white outline-none focus:border-rose-500 text-sm">
@@ -102,7 +110,7 @@
                     </div>
 
                     <div class="p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-lg space-y-3">
-                        <h4 class="text-xs font-semibold text-emerald-400 uppercase tracking-wider">Entra a:</h4>
+                        <h4 class="text-xs font-semibold text-emerald-400 uppercase tracking-wider">Entra a Disponible:</h4>
                         <div class="grid grid-cols-2 gap-2">
                             <input type="number" id="exchange-amount-to" step="0.01" required class="bg-slate-900 border border-slate-700 rounded-lg p-2 text-white outline-none focus:border-emerald-500" placeholder="Monto">
                             <select id="exchange-currency-to" class="bg-slate-900 border border-slate-700 rounded-lg p-2 text-white outline-none focus:border-emerald-500 text-sm">
@@ -121,12 +129,12 @@
                             <input type="date" id="exchange-date" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white outline-none focus:border-indigo-500">
                         </div>
                         <div>
-                            <label class="block text-sm text-slate-400 mb-1">Descripción</label>
-                            <input type="text" id="exchange-desc" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white outline-none focus:border-indigo-500" placeholder="Motivo o tasa">
+                            <label class="block text-sm text-slate-400 mb-1">Tasa / Detalle</label>
+                            <input type="text" id="exchange-desc" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white outline-none focus:border-indigo-500" placeholder="Ej. Tasa BCV">
                         </div>
                     </div>
 
-                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 rounded-lg transition-colors mt-2">
+                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 rounded-lg transition-colors mt-2 shadow-lg">
                         Registrar Intercambio
                     </button>
                 </form>
@@ -136,35 +144,35 @@
             <div class="md:col-span-2 bg-slate-800 rounded-xl border border-slate-700 p-5 shadow-lg flex flex-col">
                 <h2 class="text-lg font-semibold text-white mb-4">Libro Mayor</h2>
                 <div id="transactions-container" class="space-y-3 overflow-y-auto">
-                    <!-- Las transacciones se generan aquí por JavaScript -->
+                    <!-- JS genera las transacciones aquí -->
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Lógica de la Aplicación (JavaScript Puro) -->
+    <!-- Lógica (JavaScript) -->
     <script>
         const CURRENCIES = {
-            BS: 'Bolívares (Bs)',
+            BS: 'Bolívares',
             USDT: 'USDT',
             USD_DIGITAL: 'USD Digital',
             USD_FISICO: 'USD Físico',
             EUR_FISICO: 'EUR Físico'
         };
 
-        // Estado de la aplicación
+        // Estado principal
         let transactions = JSON.parse(localStorage.getItem('finanzas_data')) || [];
         let currentType = 'ingreso';
 
-        // Inicializar fechas con el día de hoy
+        // Fecha por defecto: hoy
         const today = new Date().toISOString().split('T')[0];
         document.getElementById('normal-date').value = today;
         document.getElementById('exchange-date').value = today;
 
-        // Renderizar todo al iniciar
+        // Arrancar
         updateUI();
 
-        // --- Funciones de Interfaz ---
+        // --- FUNCIONES DE INTERFAZ ---
 
         function switchTab(tab) {
             const formNormal = document.getElementById('form-normal');
@@ -189,17 +197,27 @@
             currentType = type;
             const btnIngreso = document.getElementById('btn-ingreso');
             const btnGasto = document.getElementById('btn-gasto');
+            const btnInversion = document.getElementById('btn-inversion');
+            const btnRetorno = document.getElementById('btn-retorno');
 
+            // Resetear estilos a gris
+            [btnIngreso, btnGasto, btnInversion, btnRetorno].forEach(btn => {
+                btn.className = "p-2 rounded-lg border flex items-center justify-center gap-2 border-slate-600 text-slate-400 text-sm font-medium transition-colors";
+            });
+
+            // Aplicar estilo activo según el tipo
             if (type === 'ingreso') {
-                btnIngreso.className = "p-2 rounded-lg border flex items-center justify-center gap-2 bg-emerald-500/20 border-emerald-500 text-emerald-400";
-                btnGasto.className = "p-2 rounded-lg border flex items-center justify-center gap-2 border-slate-600 text-slate-400";
-            } else {
-                btnIngreso.className = "p-2 rounded-lg border flex items-center justify-center gap-2 border-slate-600 text-slate-400";
-                btnGasto.className = "p-2 rounded-lg border flex items-center justify-center gap-2 bg-rose-500/20 border-rose-500 text-rose-400";
+                btnIngreso.className = "p-2 rounded-lg border flex items-center justify-center gap-2 bg-emerald-500/20 border-emerald-500 text-emerald-400 text-sm font-medium transition-colors";
+            } else if (type === 'gasto') {
+                btnGasto.className = "p-2 rounded-lg border flex items-center justify-center gap-2 bg-rose-500/20 border-rose-500 text-rose-400 text-sm font-medium transition-colors";
+            } else if (type === 'inversion') {
+                btnInversion.className = "p-2 rounded-lg border flex items-center justify-center gap-2 bg-indigo-500/20 border-indigo-500 text-indigo-400 text-sm font-medium transition-colors";
+            } else if (type === 'retorno') {
+                btnRetorno.className = "p-2 rounded-lg border flex items-center justify-center gap-2 bg-amber-500/20 border-amber-500 text-amber-400 text-sm font-medium transition-colors";
             }
         }
 
-        // --- Lógica de Datos ---
+        // --- GUARDADO DE DATOS ---
 
         function handleAddNormal(e) {
             e.preventDefault();
@@ -211,7 +229,7 @@
             const newTx = {
                 id: Date.now().toString(),
                 isExchange: false,
-                type: currentType,
+                type: currentType, // ingreso, gasto, inversion, retorno
                 amount: amount,
                 currency: currency,
                 date: date,
@@ -219,10 +237,9 @@
                 isReverted: false
             };
 
-            transactions.unshift(newTx); // Añadir al principio
+            transactions.unshift(newTx);
             saveAndRender();
             
-            // Limpiar campos
             document.getElementById('normal-amount').value = '';
             document.getElementById('normal-desc').value = '';
         }
@@ -251,7 +268,6 @@
             transactions.unshift(newTx);
             saveAndRender();
 
-            // Limpiar campos
             document.getElementById('exchange-amount-from').value = '';
             document.getElementById('exchange-amount-to').value = '';
             document.getElementById('exchange-desc').value = '';
@@ -273,23 +289,46 @@
         function updateUI() {
             renderBalances();
             renderTransactions();
-            lucide.createIcons(); // Recargar íconos
+            lucide.createIcons(); // Refrescar los íconos
         }
 
-        // --- Renderizado en Pantalla ---
+        // --- CÁLCULOS Y RENDERIZADO ---
 
         function renderBalances() {
-            let balances = { BS: 0, USDT: 0, USD_DIGITAL: 0, USD_FISICO: 0, EUR_FISICO: 0 };
+            // Estructura dual para separar Disponible vs Invertido
+            let balances = {
+                BS: { available: 0, invested: 0 },
+                USDT: { available: 0, invested: 0 },
+                USD_DIGITAL: { available: 0, invested: 0 },
+                USD_FISICO: { available: 0, invested: 0 },
+                EUR_FISICO: { available: 0, invested: 0 }
+            };
             
             transactions.forEach(tx => {
-                if (tx.isReverted) return;
+                if (tx.isReverted) return; // Las anuladas no cuentan
+
+                // Asegurar que si hay monedas viejas en el historial no tiren error
+                if(!balances[tx.currency]) balances[tx.currency] = { available: 0, invested: 0 };
+                if(tx.isExchange) {
+                    if(!balances[tx.currencyFrom]) balances[tx.currencyFrom] = { available: 0, invested: 0 };
+                    if(!balances[tx.currencyTo]) balances[tx.currencyTo] = { available: 0, invested: 0 };
+                }
 
                 if (tx.isExchange) {
-                    balances[tx.currencyFrom] -= tx.amountFrom;
-                    balances[tx.currencyTo] += tx.amountTo;
+                    balances[tx.currencyFrom].available -= tx.amountFrom;
+                    balances[tx.currencyTo].available += tx.amountTo;
                 } else {
-                    if (tx.type === 'ingreso') balances[tx.currency] += tx.amount;
-                    else balances[tx.currency] -= tx.amount;
+                    if (tx.type === 'ingreso') {
+                        balances[tx.currency].available += tx.amount;
+                    } else if (tx.type === 'gasto') {
+                        balances[tx.currency].available -= tx.amount;
+                    } else if (tx.type === 'inversion') {
+                        balances[tx.currency].available -= tx.amount;
+                        balances[tx.currency].invested += tx.amount;
+                    } else if (tx.type === 'retorno') {
+                        balances[tx.currency].available += tx.amount;
+                        balances[tx.currency].invested -= tx.amount;
+                    }
                 }
             });
 
@@ -297,14 +336,28 @@
             container.innerHTML = '';
 
             Object.entries(CURRENCIES).forEach(([key, label]) => {
-                const isPositive = balances[key] >= 0;
-                const colorClass = isPositive ? 'text-emerald-400' : 'text-rose-400';
-                const formattedAmt = balances[key].toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                const available = balances[key].available;
+                const invested = balances[key].invested;
+                
+                const avColor = available >= 0 ? 'text-emerald-400' : 'text-rose-400';
+                const invColor = invested > 0 ? 'text-indigo-400' : 'text-slate-500';
+
+                const fmtAvailable = available.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                const fmtInvested = invested.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                 
                 container.innerHTML += `
-                    <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 shadow-lg">
-                        <h3 class="text-sm text-slate-400 font-medium mb-1">${label}</h3>
-                        <p class="text-xl font-bold ${colorClass}">${formattedAmt}</p>
+                    <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 shadow-lg relative overflow-hidden">
+                        <!-- Título de Moneda -->
+                        <h3 class="text-sm text-slate-400 font-medium mb-1 relative z-10">${label}</h3>
+                        
+                        <!-- Saldo Disponible -->
+                        <p class="text-xl font-bold ${avColor} relative z-10">${fmtAvailable}</p>
+                        
+                        <!-- Sección de Invertido (Abajo) -->
+                        <div class="mt-3 pt-2 border-t border-slate-700 flex justify-between items-center relative z-10">
+                            <span class="text-xs text-slate-500 font-medium">Invertido:</span>
+                            <span class="text-sm font-bold ${invColor}">${fmtInvested}</span>
+                        </div>
                     </div>
                 `;
             });
@@ -315,49 +368,77 @@
             
             if (transactions.length === 0) {
                 container.innerHTML = `
-                    <div class="flex-1 flex flex-col items-center justify-center text-slate-500 p-8 text-center">
-                        <p>No hay transacciones registradas.</p>
+                    <div class="flex-1 flex flex-col items-center justify-center text-slate-500 p-8 text-center h-48">
+                        <i data-lucide="book-open" class="w-8 h-8 mb-3 opacity-50"></i>
+                        <p>Libro mayor vacío.</p>
                         <p class="text-sm">Agrega un movimiento para comenzar a visualizar tu historial.</p>
                     </div>
                 `;
                 return;
             }
 
-            // Ordenar por fecha (más reciente primero)
+            // Ordenamos: Lo más reciente arriba
             const sortedTx = [...transactions].sort((a,b) => new Date(b.date) - new Date(a.date));
             container.innerHTML = '';
 
             sortedTx.forEach(tx => {
-                const bgClass = tx.isReverted ? 'bg-slate-900/50 border-slate-800 opacity-60' : 'bg-slate-900 border-slate-700';
-                const textClass = tx.isReverted ? 'line-through text-slate-500' : 'text-white';
+                const isAnulada = tx.isReverted;
+                const bgClass = isAnulada ? 'bg-slate-900/50 border-slate-800 opacity-60' : 'bg-slate-900 border-slate-700';
+                const textClass = isAnulada ? 'line-through text-slate-500' : 'text-white';
                 
                 let tagHtml = '';
                 let amountHtml = '';
 
+                // SI ES INTERCAMBIO
                 if (tx.isExchange) {
-                    tagHtml = `<span class="text-xs px-2 py-1 bg-indigo-500/20 text-indigo-400 rounded-md flex items-center gap-1 font-medium w-fit"><i data-lucide="arrow-right-left" class="w-3 h-3"></i> Intercambio</span>`;
+                    tagHtml = `<span class="text-xs px-2 py-1 bg-slate-700 text-slate-300 rounded-md flex items-center gap-1 font-medium w-fit"><i data-lucide="arrow-right-left" class="w-3 h-3"></i> Intercambio</span>`;
                     amountHtml = `
-                        <div class="flex flex-col items-end text-sm ${tx.isReverted ? 'line-through text-slate-500' : ''}">
-                            <span class="text-rose-400 font-medium">-${tx.amountFrom} ${CURRENCIES[tx.currencyFrom]}</span>
-                            <span class="text-emerald-400 font-medium">+${tx.amountTo} ${CURRENCIES[tx.currencyTo]}</span>
+                        <div class="flex flex-col items-end text-sm ${isAnulada ? 'line-through text-slate-500' : ''}">
+                            <span class="text-rose-400 font-medium">-${tx.amountFrom} ${tx.currencyFrom}</span>
+                            <span class="text-emerald-400 font-medium">+${tx.amountTo} ${tx.currencyTo}</span>
                         </div>
                     `;
-                } else {
-                    const isIngreso = tx.type === 'ingreso';
-                    const tagStyle = isIngreso ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400';
-                    const amtStyle = isIngreso ? 'text-emerald-400' : 'text-rose-400';
-                    tagHtml = `<span class="text-xs px-2 py-1 rounded-md font-medium w-fit ${tagStyle}">${isIngreso ? 'Ingreso' : 'Gasto'}</span>`;
-                    
+                } 
+                // SI ES NORMAL (Ingreso, Gasto, Inversion, Retorno)
+                else {
+                    let tagStyle = '';
+                    let tagText = '';
+                    let amtStyle = '';
+                    let sign = '';
+
+                    if (tx.type === 'ingreso') {
+                        tagStyle = 'bg-emerald-500/20 text-emerald-400';
+                        tagText = 'Ingreso';
+                        amtStyle = 'text-emerald-400';
+                        sign = '+';
+                    } else if (tx.type === 'gasto') {
+                        tagStyle = 'bg-rose-500/20 text-rose-400';
+                        tagText = 'Gasto';
+                        amtStyle = 'text-rose-400';
+                        sign = '-';
+                    } else if (tx.type === 'inversion') {
+                        tagStyle = 'bg-indigo-500/20 text-indigo-400';
+                        tagText = 'Inversión';
+                        amtStyle = 'text-indigo-400';
+                        sign = '↓'; // Sale del disponible
+                    } else if (tx.type === 'retorno') {
+                        tagStyle = 'bg-amber-500/20 text-amber-400';
+                        tagText = 'Retorno Inv.';
+                        amtStyle = 'text-amber-400';
+                        sign = '↑'; // Vuelve al disponible
+                    }
+
+                    tagHtml = `<span class="text-xs px-2 py-1 rounded-md font-medium w-fit ${tagStyle}">${tagText}</span>`;
                     amountHtml = `
-                        <p class="font-bold ${tx.isReverted ? 'line-through text-slate-500' : amtStyle}">
-                            ${isIngreso ? '+' : '-'}${tx.amount} <span class="text-sm font-normal text-slate-400">${CURRENCIES[tx.currency]}</span>
+                        <p class="font-bold ${isAnulada ? 'line-through text-slate-500' : amtStyle}">
+                            ${sign}${tx.amount} <span class="text-sm font-normal text-slate-400">${tx.currency}</span>
                         </p>
                     `;
                 }
 
-                const iconName = tx.isReverted ? 'refresh-cw' : 'ban';
-                const btnStyle = tx.isReverted ? 'bg-indigo-500/20 text-indigo-400 hover:bg-indigo-500/40' : 'bg-rose-500/20 text-rose-400 hover:bg-rose-500/40';
-                const title = tx.isReverted ? "Restaurar transacción" : "Anular transacción";
+                const iconName = isAnulada ? 'refresh-cw' : 'ban';
+                const btnStyle = isAnulada ? 'bg-indigo-500/20 text-indigo-400 hover:bg-indigo-500/40' : 'bg-rose-500/20 text-rose-400 hover:bg-rose-500/40';
+                const title = isAnulada ? "Restaurar transacción" : "Anular transacción";
 
                 container.innerHTML += `
                     <div class="p-4 rounded-lg border ${bgClass} flex items-center justify-between group transition-all">
