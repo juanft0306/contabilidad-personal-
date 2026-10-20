@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Dashboard Financiero</title>
+    <!-- Tailwind CSS (Diseño) cargado directamente sin instalación -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons (Íconos) -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col pb-24 font-sans p-4 md:p-8">
+
+    <div class="max-w-6xl mx-auto w-full space-y-6">
+        <!-- Cabecera -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-white mb-2">Mi Dashboard Financiero</h1>
+            <p class="text-slate-400">Control de gastos e intercambios en múltiples divisas</p>
+        </div>
+
+        <!-- Tarjetas de Balances -->
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-4" id="balances-container">
+            <!-- Los balances se generan por JavaScript -->
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-6">
+            <!-- Panel Izquierdo: Formularios -->
+            <div class="md:col-span-1 bg-slate-800 rounded-xl border border-slate-700 p-5 shadow-lg h-fit">
+                
+                <!-- Pestañas -->
+                <div class="flex space-x-2 mb-6 bg-slate-900 p-1 rounded-lg">
+                    <button id="tab-normal" onclick="switchTab('normal')" class="flex-1 py-2 text-sm font-medium rounded-md transition-colors bg-slate-700 text-white">
+                        Ingreso / Gasto
+                    </button>
+                    <button id="tab-intercambio" onclick="switchTab('intercambio')" class="flex-1 py-2 text-sm font-medium rounded-md transition-colors text-slate-400 hover:text-white">
+                        Intercambio
+                    </button>
+                </div>
+
+                <!-- Formulario Normal -->
+                <form id="form-normal" onsubmit="handleAddNormal(event)" class="space-y-4">
+                    <div class="grid grid-cols-2 gap-2">
+                        <button type="button" id="btn-ingreso" onclick="setType('ingreso')" class="p-2 rounded-lg border flex items-center justify-center gap-2 bg-emerald-500/20 border-emerald-500 text-emerald-400">
+                            <i data-lucide="arrow-down-circle" class="w-4 h-4"></i> Ingreso
+                        </button>
+                        <button type="button" id="btn-gasto" onclick="setType('gasto')" class="p-2 rounded-lg border flex items-center justify-center gap-2 border-slate-600 text-slate-400">
+                            <i data-lucide="arrow-up-circle" class="w-4 h-4"></i> Gasto
+                        </button>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm text-slate-400 mb-1">Monto</label>
+                        <input type="number" id="normal-amount" step="0.01" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white outline-none focus:border-indigo-500" placeholder="0.00">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm text-slate-400 mb-1">Moneda</label>
+                        <select id="normal-currency" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white outline-none focus:border-indigo-500">
+                            <option value="BS">Bolívares (Bs)</option>
+                            <option value="USDT">USDT</option>
+                            <option value="USD_DIGITAL">USD Digital</option>
+                            <option value="USD_FISICO">USD Físico</option>
+                            <option value="EUR_FISICO">EUR Físico</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm text-slate-400 mb-1">Fecha</label>
+                        <input type="date" id="normal-date" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white outline-none focus:border-indigo-500">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm text-slate-400 mb-1">Descripción</label>
+                        <input type="text" id="normal-desc" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white outline-none focus:border-indigo-500" placeholder="Ej. Compra de insumos">
+                    </div>
+
+                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 rounded-lg transition-colors">
+                        Registrar Movimiento
+                    </button>
+                </form>
+
+                <!-- Formulario Intercambio -->
+                <form id="form-intercambio" onsubmit="handleAddExchange(event)" class="space-y-4 hidden">
+                    <div class="p-3 bg-rose-500/10 border border-rose-500/30 rounded-lg space-y-3">
+                        <h4 class="text-xs font-semibold text-rose-400 uppercase tracking-wider">Sale de:</h4>
+                        <div class="grid grid-cols-2 gap-2">
+                            <input type="number" id="exchange-amount-from" step="0.01" required class="bg-slate-900 border border-slate-700 rounded-lg p-2 text-white outline-none focus:border-rose-500" placeholder="Monto">
+                            <select id="exchange-currency-from" class="bg-slate-900 border border-slate-700 rounded-lg p-2 text-white outline-none focus:border-rose-500 text-sm">
+                                <option value="BS">Bolívares (Bs)</option>
+                                <option value="USDT">USDT</option>
+                                <option value="USD_DIGITAL">USD Digital</option>
+                                <option value="USD_FISICO">USD Físico</option>
+                                <option value="EUR_FISICO">EUR Físico</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-center -my-2 relative z-10">
+                        <div class="bg-slate-800 p-1 rounded-full border border-slate-600">
+                            <i data-lucide="arrow-right-left" class="text-slate-400 w-4 h-4"></i>
+                        </div>
+                    </div>
+
+                    <div class="p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-lg space-y-3">
+                        <h4 class="text-xs font-semibold text-emerald-400 uppercase tracking-wider">Entra a:</h4>
+                        <div class="grid grid-cols-2 gap-2">
+                            <input type="number" id="exchange-amount-to" step="0.01" required class="bg-slate-900 border border-slate-700 rounded-lg p-2 text-white outline-none focus:border-emerald-500" placeholder="Monto">
+                            <select id="exchange-currency-to" class="bg-slate-900 border border-slate-700 rounded-lg p-2 text-white outline-none focus:border-emerald-500 text-sm">
+                                <option value="BS">Bolívares (Bs)</option>
+                                <option value="USDT">USDT</option>
+                                <option value="USD_DIGITAL">USD Digital</option>
+                                <option value="USD_FISICO" selected>USD Físico</option>
+                                <option value="EUR_FISICO">EUR Físico</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-sm text-slate-400 mb-1">Fecha</label>
+                            <input type="date" id="exchange-date" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white outline-none focus:border-indigo-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm text-slate-400 mb-1">Descripción</label>
+                            <input type="text" id="exchange-desc" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white outline-none focus:border-indigo-500" placeholder="Motivo o tasa">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 rounded-lg transition-colors mt-2">
+                        Registrar Intercambio
+                    </button>
+                </form>
+            </div>
+
+            <!-- Panel Derecho: Libro Mayor -->
+            <div class="md:col-span-2 bg-slate-800 rounded-xl border border-slate-700 p-5 shadow-lg flex flex-col">
+                <h2 class="text-lg font-semibold text-white mb-4">Libro Mayor</h2>
+                <div id="transactions-container" class="space-y-3 overflow-y-auto">
+                    <!-- Las transacciones se generan aquí por JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lógica de la Aplicación (JavaScript Puro) -->
+    <script>
+        const CURRENCIES = {
+            BS: 'Bolívares (Bs)',
+            USDT: 'USDT',
+            USD_DIGITAL: 'USD Digital',
+            USD_FISICO: 'USD Físico',
+            EUR_FISICO: 'EUR Físico'
+        };
+
+        // Estado de la aplicación
+        let transactions = JSON.parse(localStorage.getItem('finanzas_data')) || [];
+        let currentType = 'ingreso';
+
+        // Inicializar fechas con el día de hoy
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('normal-date').value = today;
+        document.getElementById('exchange-date').value = today;
+
+        // Renderizar todo al iniciar
+        updateUI();
+
+        // --- Funciones de Interfaz ---
+
+        function switchTab(tab) {
+            const formNormal = document.getElementById('form-normal');
+            const formExchange = document.getElementById('form-intercambio');
+            const tabNormal = document.getElementById('tab-normal');
+            const tabExchange = document.getElementById('tab-intercambio');
+
+            if (tab === 'normal') {
+                formNormal.classList.remove('hidden');
+                formExchange.classList.add('hidden');
+                tabNormal.className = "flex-1 py-2 text-sm font-medium rounded-md transition-colors bg-slate-700 text-white";
+                tabExchange.className = "flex-1 py-2 text-sm font-medium rounded-md transition-colors text-slate-400 hover:text-white";
+            } else {
+                formNormal.classList.add('hidden');
+                formExchange.classList.remove('hidden');
+                tabNormal.className = "flex-1 py-2 text-sm font-medium rounded-md transition-colors text-slate-400 hover:text-white";
+                tabExchange.className = "flex-1 py-2 text-sm font-medium rounded-md transition-colors bg-indigo-600 text-white";
+            }
+        }
+
+        function setType(type) {
+            currentType = type;
+            const btnIngreso = document.getElementById('btn-ingreso');
+            const btnGasto = document.getElementById('btn-gasto');
+
+            if (type === 'ingreso') {
+                btnIngreso.className = "p-2 rounded-lg border flex items-center justify-center gap-2 bg-emerald-500/20 border-emerald-500 text-emerald-400";
+                btnGasto.className = "p-2 rounded-lg border flex items-center justify-center gap-2 border-slate-600 text-slate-400";
+            } else {
+                btnIngreso.className = "p-2 rounded-lg border flex items-center justify-center gap-2 border-slate-600 text-slate-400";
+                btnGasto.className = "p-2 rounded-lg border flex items-center justify-center gap-2 bg-rose-500/20 border-rose-500 text-rose-400";
+            }
+        }
+
+        // --- Lógica de Datos ---
+
+        function handleAddNormal(e) {
+            e.preventDefault();
+            const amount = parseFloat(document.getElementById('normal-amount').value);
+            const currency = document.getElementById('normal-currency').value;
+            const date = document.getElementById('normal-date').value;
+            const desc = document.getElementById('normal-desc').value;
+
+            const newTx = {
+                id: Date.now().toString(),
+                isExchange: false,
+                type: currentType,
+                amount: amount,
+                currency: currency,
+                date: date,
+                description: desc,
+                isReverted: false
+            };
+
+            transactions.unshift(newTx); // Añadir al principio
+            saveAndRender();
+            
+            // Limpiar campos
+            document.getElementById('normal-amount').value = '';
+            document.getElementById('normal-desc').value = '';
+        }
+
+        function handleAddExchange(e) {
+            e.preventDefault();
+            const amountFrom = parseFloat(document.getElementById('exchange-amount-from').value);
+            const currencyFrom = document.getElementById('exchange-currency-from').value;
+            const amountTo = parseFloat(document.getElementById('exchange-amount-to').value);
+            const currencyTo = document.getElementById('exchange-currency-to').value;
+            const date = document.getElementById('exchange-date').value;
+            const desc = document.getElementById('exchange-desc').value;
+
+            const newTx = {
+                id: Date.now().toString(),
+                isExchange: true,
+                amountFrom: amountFrom,
+                currencyFrom: currencyFrom,
+                amountTo: amountTo,
+                currencyTo: currencyTo,
+                date: date,
+                description: desc,
+                isReverted: false
+            };
+
+            transactions.unshift(newTx);
+            saveAndRender();
+
+            // Limpiar campos
+            document.getElementById('exchange-amount-from').value = '';
+            document.getElementById('exchange-amount-to').value = '';
+            document.getElementById('exchange-desc').value = '';
+        }
+
+        function toggleRevert(id) {
+            transactions = transactions.map(tx => {
+                if (tx.id === id) tx.isReverted = !tx.isReverted;
+                return tx;
+            });
+            saveAndRender();
+        }
+
+        function saveAndRender() {
+            localStorage.setItem('finanzas_data', JSON.stringify(transactions));
+            updateUI();
+        }
+
+        function updateUI() {
+            renderBalances();
+            renderTransactions();
+            lucide.createIcons(); // Recargar íconos
+        }
+
+        // --- Renderizado en Pantalla ---
+
+        function renderBalances() {
+            let balances = { BS: 0, USDT: 0, USD_DIGITAL: 0, USD_FISICO: 0, EUR_FISICO: 0 };
+            
+            transactions.forEach(tx => {
+                if (tx.isReverted) return;
+
+                if (tx.isExchange) {
+                    balances[tx.currencyFrom] -= tx.amountFrom;
+                    balances[tx.currencyTo] += tx.amountTo;
+                } else {
+                    if (tx.type === 'ingreso') balances[tx.currency] += tx.amount;
+                    else balances[tx.currency] -= tx.amount;
+                }
+            });
+
+            const container = document.getElementById('balances-container');
+            container.innerHTML = '';
+
+            Object.entries(CURRENCIES).forEach(([key, label]) => {
+                const isPositive = balances[key] >= 0;
+                const colorClass = isPositive ? 'text-emerald-400' : 'text-rose-400';
+                const formattedAmt = balances[key].toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                
+                container.innerHTML += `
+                    <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 shadow-lg">
+                        <h3 class="text-sm text-slate-400 font-medium mb-1">${label}</h3>
+                        <p class="text-xl font-bold ${colorClass}">${formattedAmt}</p>
+                    </div>
+                `;
+            });
+        }
+
+        function renderTransactions() {
+            const container = document.getElementById('transactions-container');
+            
+            if (transactions.length === 0) {
+                container.innerHTML = `
+                    <div class="flex-1 flex flex-col items-center justify-center text-slate-500 p-8 text-center">
+                        <p>No hay transacciones registradas.</p>
+                        <p class="text-sm">Agrega un movimiento para comenzar a visualizar tu historial.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Ordenar por fecha (más reciente primero)
+            const sortedTx = [...transactions].sort((a,b) => new Date(b.date) - new Date(a.date));
+            container.innerHTML = '';
+
+            sortedTx.forEach(tx => {
+                const bgClass = tx.isReverted ? 'bg-slate-900/50 border-slate-800 opacity-60' : 'bg-slate-900 border-slate-700';
+                const textClass = tx.isReverted ? 'line-through text-slate-500' : 'text-white';
+                
+                let tagHtml = '';
+                let amountHtml = '';
+
+                if (tx.isExchange) {
+                    tagHtml = `<span class="text-xs px-2 py-1 bg-indigo-500/20 text-indigo-400 rounded-md flex items-center gap-1 font-medium w-fit"><i data-lucide="arrow-right-left" class="w-3 h-3"></i> Intercambio</span>`;
+                    amountHtml = `
+                        <div class="flex flex-col items-end text-sm ${tx.isReverted ? 'line-through text-slate-500' : ''}">
+                            <span class="text-rose-400 font-medium">-${tx.amountFrom} ${CURRENCIES[tx.currencyFrom]}</span>
+                            <span class="text-emerald-400 font-medium">+${tx.amountTo} ${CURRENCIES[tx.currencyTo]}</span>
+                        </div>
+                    `;
+                } else {
+                    const isIngreso = tx.type === 'ingreso';
+                    const tagStyle = isIngreso ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400';
+                    const amtStyle = isIngreso ? 'text-emerald-400' : 'text-rose-400';
+                    tagHtml = `<span class="text-xs px-2 py-1 rounded-md font-medium w-fit ${tagStyle}">${isIngreso ? 'Ingreso' : 'Gasto'}</span>`;
+                    
+                    amountHtml = `
+                        <p class="font-bold ${tx.isReverted ? 'line-through text-slate-500' : amtStyle}">
+                            ${isIngreso ? '+' : '-'}${tx.amount} <span class="text-sm font-normal text-slate-400">${CURRENCIES[tx.currency]}</span>
+                        </p>
+                    `;
+                }
+
+                const iconName = tx.isReverted ? 'refresh-cw' : 'ban';
+                const btnStyle = tx.isReverted ? 'bg-indigo-500/20 text-indigo-400 hover:bg-indigo-500/40' : 'bg-rose-500/20 text-rose-400 hover:bg-rose-500/40';
+                const title = tx.isReverted ? "Restaurar transacción" : "Anular transacción";
+
+                container.innerHTML += `
+                    <div class="p-4 rounded-lg border ${bgClass} flex items-center justify-between group transition-all">
+                        <div class="flex items-center gap-4 flex-1">
+                            <div class="hidden sm:block text-slate-500 text-sm shrink-0 w-24">${tx.date}</div>
+                            <div class="flex-1">
+                                <p class="font-medium ${textClass}">${tx.description}</p>
+                                <div class="flex items-center gap-2 mt-1">
+                                    ${tagHtml}
+                                    <span class="text-xs text-slate-400 sm:hidden">${tx.date}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-4 text-right shrink-0">
+                            <div>${amountHtml}</div>
+                            <button onclick="toggleRevert('${tx.id}')" class="p-2 rounded-lg opacity-0 group-hover:opacity-100 transition-all ${btnStyle}" title="${title}">
+                                <i data-lucide="${iconName}" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+    </script>
+</body>
+</html>
