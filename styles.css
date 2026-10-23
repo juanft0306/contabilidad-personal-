@@ -1,0 +1,34 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #0f172a; 
+}
+
+/* Scrollbars personalizados para modo oscuro */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: #1e293b; 
+    border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #475569; 
+    border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #64748b; 
+}
+
+/* Efectos visuales para los botones de tipo */
+.type-btn.active.ingreso { background-color: rgba(16, 185, 129, 0.2); border-color: #10b981; color: #34d399; }
+.type-btn.active.gasto { background-color: rgba(244, 63, 94, 0.2); border-color: #f43f5e; color: #fb7185; }
+.type-btn.active.aporte { background-color: rgba(236, 72, 153, 0.2); border-color: #ec4899; color: #f472b6; }
+.type-btn.active.inversion { background-color: rgba(99, 102, 241, 0.2); border-color: #6366f1; color: #818cf8; }
+.type-btn.active.retorno { background-color: rgba(245, 158, 11, 0.2); border-color: #f59e0b; color: #fbbf24; }
+.type-btn.active.ganancia_inv { background-color: rgba(245, 158, 11, 0.2); border-color: #f59e0b; color: #fbbf24; }
+.type-btn.active.comision { background-color: rgba(100, 116, 139, 0.2); border-color: #64748b; color: #94a3b8; }
