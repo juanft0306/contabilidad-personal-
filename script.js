@@ -1,7 +1,8 @@
+// AQUI VOLVEMOS A LOS NOMBRES ANTIGUOS PARA NO ROMPER TUS DATOS GUARDADOS
 const ACCOUNTS = {
-    BS_BANCO: { label: 'Bs (Banco)', symbol: 'Bs', type: 'fiat' },
-    USDT_BINANCE: { label: 'USDT (Binance)', symbol: 'USDT', type: 'crypto' },
-    USD_CASHEA: { label: 'USD (Cashea/Zinli)', symbol: '$', type: 'fiat' },
+    BS: { label: 'Bolívares (Bs)', symbol: 'Bs', type: 'fiat' },
+    USDT: { label: 'USDT', symbol: 'USDT', type: 'crypto' },
+    USD_DIGITAL: { label: 'USD Digital', symbol: '$', type: 'fiat' },
     USD_FISICO: { label: 'USD Físico', symbol: '$', type: 'fiat' },
     EUR_FISICO: { label: 'EUR Físico', symbol: '€', type: 'fiat' }
 };
@@ -172,12 +173,15 @@ function updateUI() {
     let stats = { incomes: 0, expenses: 0, shares: 0, adjustments: 0, roi: 0, currentUsdEq: 0 };
     Object.keys(ACCOUNTS).forEach(k => balances[k] = { available: 0, invested: 0 });
     
-    // Convertir todo a valor USD usando las tasas en Bolívares
+    // Convertir todo a valor USD usando las tasas cruzadas
     const toUSD = (amount, currency) => {
-        if (currency === 'BS_BANCO') return amount / rates.USD;
-        if (currency === 'USDT_BINANCE') return (amount * rates.USDT) / rates.USD;
+        if (!ACCOUNTS[currency]) return 0; // Proteccion si hay datos raros guardados
+        
+        if (currency === 'BS') return amount / rates.USD;
+        if (currency === 'USDT') return (amount * rates.USDT) / rates.USD;
         if (currency === 'EUR_FISICO') return (amount * rates.EUR) / rates.USD;
-        // USD Físico o Cashea
+        
+        // Aplica para USD_FISICO y USD_DIGITAL
         return amount;
     };
 
@@ -195,6 +199,10 @@ function updateUI() {
 
     transactions.forEach(tx => {
         if (tx.isReverted) return;
+        
+        // Si hay una moneda que fue borrada y existe en memoria, ignorar la operacion para no crashear
+        if (tx.isExchange && (!ACCOUNTS[tx.currencyFrom] || !ACCOUNTS[tx.currencyTo])) return;
+        if (!tx.isExchange && !ACCOUNTS[tx.currency]) return;
 
         const usdValue = toUSD(tx.amount || 0, tx.currency);
         const txTime = new Date(tx.date + 'T12:00:00').getTime();
@@ -298,6 +306,10 @@ function updateUI() {
     let filteredOut = 0;
 
     let filtered = transactions.filter(tx => {
+        // Ignorar monedas viejas que ya no existan en ACCOUNTS para que no rompa el filtro
+        if (tx.isExchange && (!ACCOUNTS[tx.currencyFrom] || !ACCOUNTS[tx.currencyTo])) return false;
+        if (!tx.isExchange && !ACCOUNTS[tx.currency]) return false;
+
         if (typeFilter !== 'all') {
             if (typeFilter === 'exchange' && !tx.isExchange) return false;
             if (typeFilter !== 'exchange' && (tx.isExchange || tx.type !== typeFilter)) return false;
@@ -400,3 +412,4 @@ function updateUI() {
     }
     lucide.createIcons();
 }
+                 
